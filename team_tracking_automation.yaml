@@ -1,0 +1,20 @@
+alias: team tracking updateable for voice assistant
+description: ""
+triggers:
+  - trigger: conversation
+    command:
+      - update teamtracking updatable {league} {team} {sport}
+conditions: []
+actions:
+  - action: teamtracker.call_api
+    metadata: {}
+    data:
+      league_path: |
+        {{ trigger.slots.league }}
+      team_id: |
+        {{ trigger.slots.team }}
+      sport_path: |
+        {{ trigger.slots.sport }}
+    target:
+      entity_id: sensor.teamtracker_updatable
+mode: single
