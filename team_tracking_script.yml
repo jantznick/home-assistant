@@ -1,0 +1,50 @@
+sequence:
+  - action: conversation.process
+    metadata: {}
+    data:
+      agent_id: conversation.chatgpt
+      text: >
+        Given the following question please extract the sports league, sport
+        that is played(hockey, baseball, basketball or football) and 2,3 or 4
+        letter team abbreviation commonly used for the team in the question.
+        Response should be formatted as plain text, on a single line, with no
+        doc strings or any other text or punctuation: 'league nhl team tbl sport
+        hockey' Question: {{ question }}
+    response_variable: team_data
+  - action: conversation.process
+    metadata: {}
+    data:
+      text: >-
+        update teamtracking updatable {{ team_data.response.speech.plain.speech
+        }}
+      agent_id: conversation.home_assistant
+  - action: conversation.process
+    metadata: {}
+    data:
+      agent_id: conversation.chatgpt
+      text: >
+        Given the following data about a sports team, please answer this
+        question:
+          {{ question }} Data from the espn api: location - {{
+        state_attr('sensor.teamtracker_updatable','location') }}, kickoff in -
+        {{ state_attr('sensor.teamtracker_updatable','kickoff_in') }}, date - {{
+        state_attr('sensor.teamtracker_updatable','date') }}, odds - {{
+        state_attr('sensor.teamtracker_updatable','odds') }}, opponent name - {{
+        state_attr('sensor.teamtracker_updatable','opponent_long_name') }},
+        event name - {{ state_attr('sensor.teamtracker_updatable','event_name')
+        }},  team name - {{
+        state_attr('sensor.teamtracker_updatable','team_long_name') }},
+    response_variable: answer
+  - stop: Over
+    response_variable: answer
+alias: Professional Sports Games today and upcoming
+description: >-
+  This script can be used to give info about nhl, mlb, nba, and nfl professional
+  sports leagues games. It determines when any team has an upcoming game or game
+  on the same day.
+fields:
+  question:
+    selector:
+      text: null
+    name: Question
+    required: true
